@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .converter-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .swap-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .currency-option {
+            display: flex;
+            align-items: center;
+        }
+        .currency-option img {
+            width: 20px;
+            height: 15px;
+            margin-right: 10px;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .header {
+            background-color: 608dec;
+            color: black;
+            text-align: center;
+            padding: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Currency Converter</h1>
+    </header>
+    
+    <div class="container">
+        <div class="converter-container text-center">
+            <h2 class="mb-4">Convert Your Currency</h2>
+            <div class="mb-3">
+                <input type="number" id="amount" class="form-control" placeholder="Enter amount">
+            </div>
+            <div class="row mb-3 align-items-center">
+                <div class="col d-flex align-items-center">
+                    <img id="fromFlag" src="" alt="Flag" class="me-2" width="30" height="20">
+                    <select id="fromCurrency" class="form-select"></select>
+                </div>
+                <div class="col-auto">
+                    <button class="swap-btn" onclick="swapCurrencies()">&#x21C4;</button>
+                </div>
+                <div class="col d-flex align-items-center">
+                    <img id="toFlag" src="" alt="Flag" class="me-2" width="30" height="20">
+                    <select id="toCurrency" class="form-select"></select>
+                </div>
+            </div>
+            <button class="btn btn-primary w-100" onclick="convertCurrency()">Convert</button>
+            <h3 class="mt-4">Converted Amount:</h3>
+            <input type="text" id="result" class="form-control text-center" readonly>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>&copy; 2025 Currency Converter. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        const apiKey = 'YOUR_API_KEY';
+        const apiUrl = https://api.exchangerate-api.com/v4/latest/USD;
+        const countryFlags = {
+            "USD": "https://flagcdn.com/w40/us.png",
+            "EUR": "https://flagcdn.com/w40/eu.png",
+            "GBP": "https://flagcdn.com/w40/gb.png",
+            "INR": "https://flagcdn.com/w40/in.png",
+            "JPY": "https://flagcdn.com/w40/jp.png",
+            "AUD": "https://flagcdn.com/w40/au.png",
+            "CAD": "https://flagcdn.com/w40/ca.png",
+            "CNY": "https://flagcdn.com/w40/cn.png",
+            "BRL": "https://flagcdn.com/w40/br.png",
+            "ZAR": "https://flagcdn.com/w40/za.png",
+            "RUB": "https://flagcdn.com/w40/ru.png",
+            "SGD": "https://flagcdn.com/w40/sg.png",
+            "HKD": "https://flagcdn.com/w40/hk.png",
+            "CHF": "https://flagcdn.com/w40/ch.png",
+            "NZD": "https://flagcdn.com/w40/nz.png",
+            "MXN": "https://flagcdn.com/w40/mx.png",
+            "KRW": "https://flagcdn.com/w40/kr.png"
+        };
+        
+        $(document).ready(function() {
+            $.get(apiUrl, function(data) {
+                let currencyOptions = Object.keys(data.rates).map(currency => {
+                    let flagUrl = countryFlags[currency] || https://flagcdn.com/w40/${currency.substring(0,2).toLowerCase()}.png;
+                    return <option value="${currency}" data-flag="${flagUrl}">${currency}</option>;
+                });
+                $('#fromCurrency').html(currencyOptions.join(''));
+                $('#toCurrency').html(currencyOptions.join(''));
+                updateFlags();
+            });
+        });
+        
+        function convertCurrency() {
+            let amount = $('#amount').val();
+            let fromCurrency = $('#fromCurrency').val();
+            let toCurrency = $('#toCurrency').val();
+            
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount");
+                return;
+            }
+            
+            $.get(https://api.exchangerate-api.com/v4/latest/${fromCurrency}, function(data) {
+                let rate = data.rates[toCurrency];
+                let convertedAmount = (amount * rate).toFixed(2);
+                $('#result').val(${convertedAmount} ${toCurrency});
+            });
+        }
+        
+        function swapCurrencies() {
+            let fromCurrency = $('#fromCurrency').val();
+            let toCurrency = $('#toCurrency').val();
+            $('#fromCurrency').val(toCurrency);
+            $('#toCurrency').val(fromCurrency);
+            updateFlags();
+        }
+        
+        function updateFlags() {
+            let fromCurrency = $('#fromCurrency').val();
+            let toCurrency = $('#toCurrency').val();
+            $('#fromFlag').attr('src', countryFlags[fromCurrency] || https://flagcdn.com/w40/${fromCurrency.substring(0,2).toLowerCase()}.png);
+            $('#toFlag').attr('src', countryFlags[toCurrency] || https://flagcdn.com/w40/${toCurrency.substring(0,2).toLowerCase()}.png);
+        }
+        
+        $('#fromCurrency, #toCurrency').on('change', updateFlags);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
